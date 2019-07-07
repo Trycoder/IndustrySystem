@@ -1,0 +1,41 @@
+﻿<%@ Page Language="VB" MasterPageFile="~/Master.master" AutoEventWireup="false" CodeFile="AssetCategory.aspx.vb" Inherits="AssetCategory" title="Untitled Page" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
+    <table cellpadding='0' cellspacing='0' border='0' width="90%" align="center">
+        <tr class="tdcolbg">
+            <td>                 
+                <table cellpadding='4' cellspacing='1' border='0' width='100%' align='center'>
+                    <tr class="trheaderbg">
+                        <td align="left">Add New/Update Asset Category</td>
+                    </tr>
+                    <tr class="whitebg">
+                        <td align="center" class="tdtext">
+                            Category Code :
+                            <asp:TextBox ID="txtCategoryCode" class="control" Width="200" runat="server"></asp:TextBox>
+                        </td>
+                    </tr>
+                    <tr class="whitebg">
+                        <td align="center" class="tdtext">
+                            Category Description :
+                            <asp:TextBox ID="txtCategoryDesc" class="control" Width="200" runat="server"></asp:TextBox>
+                        </td>
+                    </tr>
+                    <tr class="whitebg">
+                        <td align="center" class="tdtext">
+                            Group Name :
+                            <asp:DropDownList ID="cboGroupName" class="control" Width="150" runat="server">
+                            </asp:DropDownList>
+                        </td>
+                    </tr>                    
+                </table>
+            </td>
+        </tr>
+        <tr style="padding-top:10px;">
+            <td align="center">
+                <asp:Button ID="btnUpdate" runat="server" Text="Update" class="lButton" Width="100"/>
+                <asp:Button ID="btnCancel" runat="server" Text="Cancel" class="lButton" Width="100"/>
+            </td>
+        </tr>
+    </table>
+</asp:Content>
+

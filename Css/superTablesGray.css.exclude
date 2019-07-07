@@ -1,0 +1,288 @@
+/*
+///////////////////////////////////////////////////////////////////////////////////////// 
+// SUPER TABLES - VERSION 0.21
+// SCRIPT BY MATT MURPHY --- visit www.matts411.com
+///////////////////////////////////////////////////////////////////////////////////////// 
+// GRAY SKIN
+///////////////////////////////////////////////////////////////////////////////////////// 
+// *Warning* 
+//		If you choose to modify this file do so with caution! ( recommend backing up first)
+///////////////////////////////////////////////////////////////////////////////////////// 
+*/
+.displayContainer {
+	float: left;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 5px;
+	margin-left: 0px;
+	padding: 0px;
+	border: none;
+	width:1100px;
+	height: 500px;
+	text-align:center;
+	background-color: #eeeeee;
+}
+.themeTitle {
+	display: block;
+	margin: 0px;
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-bottom: 4px;
+	padding-left: 10px;
+	border: none;
+	font-size:10px;
+	font-family: Verdana;
+}
+.fakeContainer {
+    margin: 0px;
+	padding: 4px;
+	border: none;
+    width: 600px;
+    height: 400px;
+	border: none;
+	background-color: #eeeeee;
+    overflow: hidden;
+}
+
+/* MAIN CONTAINER */
+.sContainer_Gray {
+    width: 100%;
+    height: 100%;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #ccccff;
+    overflow: hidden;
+    position: relative;
+    color: #000000;
+   
+}
+
+/* HEADER TABLE */
+.sTableHeader_Gray {
+    position: relative;
+    margin: 0px;
+    padding: 0px;
+	border: none;
+    border-spacing: 0px 0px;
+    border-collapse: collapse;
+    width: 1px;
+}
+.sTableHeader_Gray th {
+    padding-top: 2px;
+    padding-right: 5px;
+    padding-bottom: 2px;
+    padding-left: 3px;
+    border-top-width: 0px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 0px;
+    border-style: solid;
+    border-right-color: #ccccff;
+    border-bottom-color: #ccccff;
+    color: #000;    
+    background-image:url('title.png');
+    line-height:25px;
+}
+.sTableHeader_Gray th div {
+	color: #fff;
+    white-space: nowrap;
+   font-size:11px;
+	font-family: Verdana;
+	
+}
+
+/* DATA TABLE */
+.sTableData_Gray {
+    margin: 0px;
+    padding: 0px;
+    border: none;
+    border-spacing: 0px 0px;
+    border-collapse: collapse;
+	width: 1px;
+	background:#fff;
+}
+.sTableData_Gray tr.b_Gray {
+    background-color: #E6E0F8;
+}
+.sTableData_Gray tr.b_Gray.alt {
+    background-color: red;
+}
+.sTableData_Gray td {
+    padding-top: 2px;
+    padding-right: 5px;
+    padding-bottom: 2px;
+    padding-left: 3px;
+    border-top-width: 0px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 0px;
+    border-style: solid;
+    border-right-color: #ccccff;
+    border-bottom-color: #ccccff;
+ }
+.sTableData_Gray td div {
+	color: #000000;
+    white-space: nowrap;
+    font-size:11px;
+	font-family: Verdana;
+}
+
+/* FIXED HEADER TABLE - 1 COLUMN */
+.sTableFixedHeader_Gray {
+    position: absolute;
+    z-index: 4;
+    margin: 0px;
+    padding: 0px;
+    border: none;
+    border-spacing: 0px 0px;
+    border-collapse: collapse;
+    width: 1px;
+}
+.sTableFixedHeader_Gray th {
+    padding-top: 2px;
+    padding-right: 5px;
+    padding-bottom: 2px;
+    padding-left: 3px;
+    border-top-width: 0px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 0px;
+    border-style: solid;
+    border-color: #ccccff;
+    background-image:url('title.png');
+    line-height:25px;
+
+    
+}
+/* fixed data header */
+.sTableFixedHeader_Gray th div {
+	color: #fff;
+    white-space: nowrap;
+   font-size:11px;
+	font-family: Verdana;
+	
+	}
+/* FIXED DATA TABLE - 1 COLUMN */
+.sTableFixedData_Gray {
+    position: absolute;
+    z-index: 3;
+    margin: 0px;
+    padding: 0px;
+    border: none;
+    border-spacing: 0px 0px;
+    border-collapse: collapse;
+    width: 1px;
+    text-align:center;
+   }
+.sTableFixedData_Gray td {
+    padding-top: 2px;
+    padding-right: 5px;
+    padding-bottom: 2px;
+    padding-left: 3px;
+    border-top-width: 0px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 0px;
+    border-style: solid;
+    border-right-color: #ccccff;
+    border-bottom-color: #ccccff;
+    background-image:url('title.png');
+    line-height:19px;
+    
+    
+}
+/* fixed data column */
+.sTableFixedData_Gray td div {
+	white-space: nowrap;
+    font-size:11px;
+	font-family: Verdana;
+	color: #fff;
+	
+}
+
+/* RESIZE ATTRIBUTE ADD-ONS AND ELEMENTS */
+.sTableResize_Gray th div, .sTableResize_Gray td div {
+    overflow: hidden;
+}
+.sResizeContainer_Gray {
+    position: absolute;
+    z-index: 2;
+    top: 0px;
+    left: 0px;
+}
+.sResizeA_Gray {
+    position: absolute;
+    z-index: 2;
+    top: 0px;
+    left: 0px;
+    display: block;
+    width: 5px;
+    height: 100%;
+    overflow: hidden;
+    background-color: transparent;
+    cursor: e-resize;
+}
+.sResizeAFixed_Gray {
+    position: absolute;
+    z-index: 5;
+    top: 0px;
+    left: 0px;
+    display: block;
+    width: 5px;
+    height: 100%;
+    overflow: hidden;
+    background-color: transparent;
+    cursor: e-resize;
+}
+.sColSlider_Gray {
+	position: absolute;
+	z-index: 5;
+	top: 0px;
+	left: 0px;
+	display: none;
+	overflow: hidden;
+	width: 3px;
+	background-color: #808080;
+}
+
+/* OVERFLOW SCREENS */
+.sHorizontalOverflowDiv_Gray {
+	position: absolute;
+	z-index: 6;
+	left: 0px;
+	height: 15px;
+	border-color: #808080;
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 0px;
+	border-left-width: 0px;
+	border-style: solid;
+	 background-image:url('title.png');
+}
+.sVerticalOverflowDiv_Gray {
+	position: absolute;
+	z-index: 6;
+	top: 0px;
+	width: 15px;
+	border-color: #808080;
+	border-top-width: 0px;
+	border-right-width: 0px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-style: solid;
+ background-image:url('title.png');
+}
+
+/* PRE-RENDERED TABLE CLASS */
+.sTempTable {
+   background-repeat: no-repeat;
+    background-position: 100px 100px;
+ font-size:11px;
+	font-family: Verdana;
+}
+.sTempTable thead, .sTempTable tbody, .sTempTable tfoot {
+    visibility: hidden;
+}
+.sTempTable td, .sTempTable th {
+    white-space: nowrap;
+}

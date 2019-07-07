@@ -1,0 +1,35 @@
+﻿
+.tooltip {
+			border-bottom: 1px dotted #000000; color: #000000; outline: none;
+			cursor: help; text-decoration: none;
+			position: relative;
+		}
+		.tooltip span {
+			margin-left: -999em;
+			position: absolute;
+		}
+		.tooltip:hover span {
+			border-radius: 4px 4px; -moz-border-radius: 4px; -webkit-border-radius: 4px; 
+			box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.1); -webkit-box-shadow: 4px 4px rgba(0, 0, 0, 0.1); -moz-box-shadow: 4px 4px rgba(0, 0, 0, 0.1);
+			font-family:Verdana;
+			font-size:11px;
+			position: absolute; left: 0.5em; top: 2em; z-index: 99;
+			margin-left: 0; width: 210px;
+		}
+		.tooltip:hover img {
+			border: 0; margin: -10px 0px 0px -28px;
+			float: left; position: absolute;
+		}
+		.tooltip:hover em 
+		{
+			font-family: verdana; font-size: 11px; font-weight: bold;
+			display: block; padding: 0.05em 0 0.05em 0;
+		}
+		.classic { padding: 0.8em 1em; }
+		.custom { padding: 0.5em 0.8em 0.8em 2em; }
+		* html a:hover { background: transparent; }
+		.classic {background: #FFFFAA; border: 1px solid #FFAD33; }
+		.critical { background: #FFCCAA; border: 1px solid #FF3334;	}
+		.help { background: #9FDAEE; border: 1px solid #2BB0D7;	}
+		.info { background: #EFEFFB; border: 1px solid #ccccff;	}
+		.warning { background: #FFFFAA; border: 1px solid #FFAD33; }

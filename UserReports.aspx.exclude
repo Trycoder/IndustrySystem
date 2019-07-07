@@ -1,0 +1,191 @@
+﻿<%@ Page Language="VB" MasterPageFile="~/Master.master" AutoEventWireup="false" CodeFile="UserReports.aspx.vb"
+    Inherits="UserReports" Title="User Reports" %>
+
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajax" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
+    <script type="text/javascript" language="javascript">
+        function keyDownNumber() {
+            var key;
+            if (navigator.appName == 'Microsoft Internet Explorer')
+                key = event.keyCode;
+            else
+                key = event.which
+            if (!(key >= 48 && key <= 57) && key != 8 && key != 46 && key != 36 && key != 37) {
+                event.returnValue = false;
+            }
+        }
+        function NavigatetoReports(rtype, fid, catid, samepagexl) {
+            if (samepagexl == '1')
+                location.href = "ViewReport.aspx?RType=" + rtype + "&Fid=" + fid + "&Catid=" + catid;
+            if (samepagexl == '2')
+                location.href = "ReportinExcel.aspx?report=other&RType=" + rtype + "&Fid=" + fid + "&Catid=" + catid;
+        }
+    </script>
+    <style type="text/css">
+        .accordionContent
+        {
+            background-color: #778899;
+            color: Red;
+            padding: 1px 1px 1px;
+            border: none;
+        }
+        .accordionHeaderSelected
+        {
+            background-color: #3C8FD1;
+            color: white;
+            cursor: pointer;
+            font-family: verdana;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 5px;
+            padding: 5px;
+            color: #fff;
+        }
+        .accordionHeader
+        {
+            border: 1px solid #2F4F4F;
+            cursor: pointer;
+            background-color: #ccccff;
+            font-family: verdana;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 5px;
+            padding: 5px;
+        }
+        .href
+        {
+            color: red;
+            font-weight: bold;
+            text-decoration: none;
+        }
+    </style>
+    <table border="0" cellpadding="0" cellspacing="0" width="90%" align="center">
+        <% If Request.QueryString("Rpt") = "A" Then%>
+        <tr>
+            <td>
+                <ajax:Accordion ID="UserAccordion" runat="server" SelectedIndex="0" HeaderCssClass="accordionHeader"
+                    HeaderSelectedCssClass="accordionHeaderSelected" ContentCssClass="accordionContent"
+                    FadeTransitions="true" SuppressHeaderPostbacks="true" TransitionDuration="250"
+                    FramesPerSecond="40" RequireOpenedPane="false" AutoSize="None">
+                    <Panes>
+                        <ajax:AccordionPane ID="AccordionPane1" runat="server">
+                            <Header>
+                                <a href="#">Standard Reports</a></Header>
+                            <Content>
+                                <asp:Panel ID="UserReg" runat="server">
+                                    <table border="0" align="center" width="100%" cellpadding="4" cellspacing="1">
+                                        <tr class="whitebg">
+                                            <td style="width: 90%" align="left" class="tdtext" colspan="3">
+                                                Select Asset:
+                                                <asp:DropDownList ID="cboAsset" class="control" runat="server" Width="150px">
+                                                </asp:DropDownList>
+                                                Age more than:
+                                                <asp:TextBox ID="txtAge" class="control" runat="server" Width="60px" onkeypress="keyDownNumber();"></asp:TextBox>
+                                                <asp:DropDownList ID="cboAge" class="control" runat="server" Width="100px">
+                                                    <asp:ListItem Text="Day(s)"></asp:ListItem>
+                                                    <asp:ListItem Text="Month(s)"></asp:ListItem>
+                                                    <asp:ListItem Text="Year(s)"></asp:ListItem>
+                                                </asp:DropDownList>
+                                            </td>
+                                            <td style="width: 5%" align="center" class="tdtext">
+                                                <asp:ImageButton ID="imgasset" runat="server" ImageUrl="~/Images/Viewreport1.png"
+                                                    ToolTip="Click To View Report" />
+                                            </td>
+                                            <td style="width: 5%" align="center" class="tdtext">
+                                                <asp:ImageButton ID="imgxlsasset" runat="server" ImageUrl="~/Images/xlsicon.gif"
+                                                    ToolTip="Click To View Report" />
+                                            </td>
+                                        </tr>
+                                        <tr class="whitebg">
+                                            <td align="left" class="tdtext" colspan="3">
+                                                Employee having more than:
+                                                <asp:TextBox ID="txtCount" class="control" runat="server" Width="60px" onkeypress="keyDownNumber();"></asp:TextBox>
+                                                <asp:DropDownList ID="cboAssetCount" class="control" runat="server" Width="150px">
+                                                </asp:DropDownList>
+                                            </td>
+                                            <td style="width: 5%" align="center" class="tdtext">
+                                                <asp:ImageButton ID="imageemployee" runat="server" ImageUrl="~/Images/Viewreport1.png"
+                                                    ToolTip="Click To View Report" />
+                                            </td>
+                                            <td style="width: 5%" align="center" class="tdtext">
+                                                <asp:ImageButton ID="imgxlsemployee" runat="server" ImageUrl="~/Images/xlsicon.gif"
+                                                    ToolTip="Click To View Report" />
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </asp:Panel>
+                            </Content>
+                        </ajax:AccordionPane>
+                    </Panes>
+                </ajax:Accordion>
+                <%
+                    Dim con1 As System.Data.SqlClient.SqlConnection = New System.Data.SqlClient.SqlConnection(ConfigurationManager.ConnectionStrings("IMS").ConnectionString)
+                    Dim cmd1 As New System.Data.SqlClient.SqlCommand
+                    Dim rdr1 As System.Data.SqlClient.SqlDataReader
+                    Dim str1 As String
+                    'Dim I As Integer
+                    con1.Open()
+                    str1 = "select * from tbl_Asset_reportcategory order by catcode"
+                    cmd1.CommandText = str1
+                    cmd1.Connection = con1
+                    rdr1 = cmd1.ExecuteReader
+                    While rdr1.Read%>
+                     <ajax:AccordionPane ID="AccordionPane2" runat="server">
+                 <Header><a href="#"><% = rdr1("catcode")%></a></Header>
+                 <Content>
+                 <asp:Panel ID="Panel1" runat="server">
+                         <table border="0" align="center" width="100%" cellpadding="4" cellspacing="1">
+                		 <%
+		   
+		     Dim con As System.Data.SqlClient.SqlConnection = New System.Data.SqlClient.SqlConnection(ConfigurationManager.ConnectionStrings("IMS").ConnectionString)
+		     Dim cmd As New System.Data.SqlClient.SqlCommand
+		     Dim rdr As System.Data.SqlClient.SqlDataReader
+		     Dim con2 As System.Data.SqlClient.SqlConnection = New System.Data.SqlClient.SqlConnection(ConfigurationManager.ConnectionStrings("IMS").ConnectionString)
+		     Dim cmd2 As New System.Data.SqlClient.SqlCommand
+                		     Dim str As String
+		     'Dim I As Integer
+		     con.Open()
+                		     str = "select * from tbl_Asset_reportformula where rights = '1' and repcatid=" & rdr1("id") & " order by id DESC"
+		     cmd.CommandText = str
+		     cmd.Connection = con
+		     rdr = cmd.ExecuteReader
+		     If rdr.HasRows Then
+                		         While rdr.Read
+                		             Dim rtype As String
+                		             Dim fid As String
+                		             Dim catid As String
+                		             rtype = "User"
+                		             fid = rdr("id")
+                		             catid = rdr("assetcatid")
+                		             
+		        %>
+                   <tr class="whitebg">
+                        <td style="width:90%" align="left" class="tdtext">
+                            <% =rdr("reportname")%>
+                        </td>                        
+                        <td style="width:5%" align="center" class="tdtext">
+                            <img alt="Click To View Report" id="imgReports<%=rdr1("id")& rdr("id")%>" src="Images/viewreport1.png" 
+                            onmouseover="this.style.cursor='hand'" onclick="NavigatetoReports('<%=rtype%>',<%=fid%>,<%=catid%>,'1');" 
+                            style="height: 16px"/>
+                        </td>
+                        <td style="width:5%" align="center" class="tdtext">  
+                            <img alt="Click To View Report" id="img1" src="Images/xlsicon.gif" onmouseover="this.style.cursor='hand'" style="height: 16px"/ onclick="NavigatetoReports('<%=rtype%>',<%=fid%>,<%=catid%>,'2');">
+                        <a href="ViewReport.aspx?RType=User&Fid=<%=rdr("id")%>&Catid=<%=rdr("assetcatid")%>" id="Hy<%=rdr1("id")& rdr("id")%>" ><% =rdr("reportname")%></a>
+                  </td>
+                    </tr>
+                                    <% 
+                End While
+                rdr.Close()
+                con2.Close()
+            End If
+                %>
+                        </table>
+                 </asp:Panel>
+                 </Content>
+                 </ajax:AccordionPane>
+                <% End While%>
+            </td>
+        </tr>
+        <% End If%>
+    </table>
+</asp:Content>

@@ -1,0 +1,110 @@
+.yui .ajax__tab_header 
+{
+    font-family:Verdana;
+    font-size:11px;
+    border-bottom:solid 5px #ccccff;
+}
+.yui .ajax__tab_header .ajax__tab_outer 
+{
+   
+    margin:0px 0.16em 0px 0px;
+    padding:1px 0px 1px 0px;
+    vertical-align:bottom;
+    border:solid 1px #ccccff;
+    border-bottom-width:0px;
+}
+.yui .ajax__tab_header .ajax__tab_tab
+{    
+   
+    padding:0.35em 0.75em;    
+    margin-right:0.01em;
+}
+.yui .ajax__tab_hover .ajax__tab_outer 
+{
+    background: url(img/sprite.png) #E6E6E6 repeat-x left -1300px;
+    cursor:hand;
+}
+.yui .ajax__tab_active .ajax__tab_tab 
+{
+    color:#fff;
+}
+.yui .ajax__tab_active .ajax__tab_outer
+{
+   background-color:#ccccff;
+   font-weight:bold;
+}
+.yui .ajax__tab_body 
+{
+    font-size: 11px;
+	font-family: Verdana;
+	padding:0.25em 0.5em;
+    background-color:#fff;    
+    border:solid 1px #ccccff;
+    border-top-width:0px;
+}
+
+
+
+
+
+
+
+.rptinfo .ajax__tab_header 
+{
+    font-family:arial;
+    font-size:11px;    
+    border-bottom:solid 1px #808080;
+}
+.rptinfo .ajax__tab_header .ajax__tab_outer 
+{
+   
+    margin:0px 0.16em 0px 0px;
+    padding:2px 0px 2px 0px;
+    vertical-align:bottom;
+    border:solid 1px #424242;
+    border-bottom-width:0px;
+}
+.rptinfo .ajax__tab_header .ajax__tab_tab
+{    
+    padding:0.35em 0.75em;    
+    margin-right:0.09em;
+}
+.rptinfo .ajax__tab_hover .ajax__tab_outer 
+{
+    color:red;
+    cursor:hand;
+}
+.rptinfo .ajax__tab_active .ajax__tab_tab 
+{
+    color:Gray;
+    font-weight:bold;
+    cursor:default;    
+    border-bottom:solid 1px white;
+}
+.rptinfo .ajax__tab_body 
+{
+    font-family:arial;
+    padding:0.25em 0.5em;
+    background-color:white;
+    border:solid 1px #808080;
+    border-top-width:0px;
+}
+.rptinfo .ajax__tab_header .ajax__tab_active
+{
+border-bottom:solid 1px white;
+	}
+
+.mGridrptinfo {    
+    width: 100%;    
+    background-color: #fff;    
+    margin: 5px 0 10px 0;
+    border: solid 1px #cccccc;    
+    border-collapse:collapse;    
+}
+.mGridrptinfo td {    
+    padding: 5px;    
+    border: solid 1px #c1c1c1;    
+    color: Black;
+    font-size: 9px;
+    font-family:Arial;
+}

@@ -1,0 +1,217 @@
+﻿<%@ Master Language="VB" CodeFile="Master.master.vb" Inherits="Master" %>
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="asp" %>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+
+
+    
+
+    <title>ERP - AK Insutries</title>
+    <link href="CSS/slidingdoors.css" rel="stylesheet" type="text/css" />
+    <link href="Css/ApplyCSS1.css" rel="stylesheet" type="text/css" />
+    <link href="Css/grid.css" rel="Stylesheet" type="text/css" />
+    <link href="Css/tabs.css" rel="stylesheet" type="text/css" />
+    <link href="Css/ToolTip.css" rel="Stylesheet" type="text/css" />
+    <link rel="Stylesheet" href="Css/panel.css" />
+ 
+    <script src="JS/Common.js" type="text/javascript"></script>
+    <script src="JS/dropdowntabs.js" type="text/javascript"></script>
+    <script type="text/javascript" src="js/mootools.js"></script>
+    <script type="text/javascript" src="js/side-bar.js"></script>
+    <script type="text/javascript">
+        function expandcollapse(obj, row) {
+
+            var div = document.getElementById('div' + obj);
+            var img = document.getElementById('img' + obj);
+            if (div.style.display == "none") {
+                div.style.display = "block";
+                img.src = "images/minus.gif";
+                img.alt = "Close to Hide Details";
+            }
+            else {
+                div.style.display = "none";
+                img.src = "images/plus.gif";
+                img.alt = "Click to Show Details";
+            }
+        }
+        function expandcollapse1(obj, row) {
+
+            var div = document.getElementById('div12' + obj);
+            var img = document.getElementById('img12' + obj);
+            if (div.style.display == "none") {
+                div.style.display = "block";
+                img.src = "images/minus.gif";
+                img.alt = "Close to Hide Details";
+            }
+            else {
+                div.style.display = "none";
+                img.src = "images/plus.gif";
+                img.alt = "Click to Show Details";
+            }
+        } 
+    </script>
+    <style type="text/css">
+        #sideBar
+        {
+            position: absolute;
+            width: auto;
+            height: auto;
+            top: 0px;
+            right: -2px;
+            font-family: Arial;
+            color: #D1CAB0;
+        }
+        #sideBarTab
+        {
+            float: left;
+            height: 137px;
+            width: 28px;
+        }
+        #sideBarTab img
+        {
+            border: 0px solid #FFFFFF;
+        }
+        #sideBarContents
+        {
+            overflow: hidden !important;
+        }
+    </style>
+</head>
+<body style="margin: 0px;">
+    <form id="form1" runat="server">
+    <asp:ToolkitScriptManager ID="ToolkitScriptManager1" runat="server">
+    </asp:ToolkitScriptManager>
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="System.Data.SqlClient" %>
+<%@ Import Namespace="System.Configuration" %>
+
+
+            <table cellpadding="0" cellspacing="0" border="0px" width="100%" style="height: 30px">
+                    <tr style="background-color: #3272C6; padding-top: 0;">
+                        <td align="center" style="width: 10%; height: 30px; padding-left: 10px;"> 
+                            <img src="Images/LOGO.png" alt="AKI" />
+                        </td>
+                        <td align="left" style="color: #CAE1FF; font-size: 18px; width: 40%; font-weight: bold;font-family: Verdana; font-stretch: wider; white-space: nowrap; vertical-align: middle">
+                            Inventory System
+                        </td>
+                        <td align="center" style="color: #CAE1FF; font-size: 10px; width: 40%; font-weight: bold;font-family: Verdana; font-stretch: wider; white-space: nowrap; vertical-align: middle">
+                            <%=Session("EmpName") %> &nbsp;&nbsp;&nbsp;&nbsp    <%= DateTime.Now.ToString("D")%>
+                        </td>
+                        <td align="center" style="color: #CAE1FF; font-size: 26px; width: 10%; font-weight: bold;font-family: Verdana; font-stretch: wider; white-space: nowrap; vertical-align: middle">
+                            <span onmouseover="this.style.cursor='hand'" onclick="javascript:window.location='Default.aspx'">
+                                <img src="Images/home.png" title="Click to Home" alt="Home" />
+                            </span>
+                        </td>
+                </tr>
+    </table>
+
+    <table cellpadding="0" cellspacing="0" border="0px" width="100%" style="height: 30px">
+        <tr style="background-color: #3272C6; padding-top: 0;">
+            <td align="left" style="width: 30%; height: 30px; padding-left: 10px;">
+
+                <div id="slidemenu" class="slidetabsmenu">
+                    <ul>
+                        <%
+                            Dim con As SqlConnection = New SqlConnection(ConfigurationManager.ConnectionStrings("LocalDb").ConnectionString)
+                            Dim cmd As SqlCommand
+                            Dim rdr As SqlDataReader
+                            Dim Str As String
+                            If con.State = ConnectionState.Open Then
+                                con.Close()
+                            End If
+                            Dim headeritems As String = ""
+                            con.Open()
+                            Str = "select mi.id,mg.groupid,mg.rights,mi.mainmenuid,mi.submenuid,mi.menudesc,mi.pagename"
+                            Str = Str & " from tbl_asset_menugroup mg,tbl_asset_users usr,tbl_asset_menuitems mi where mg.menuid = mi.id and mi.submenuid = 0 and rights in(1,2) and submenuid = 0"
+                            Str = Str & " and mg.groupid = usr.usergroup and usr.userid = '" & Session("EmpNo") & "'"
+                            cmd = New SqlCommand(Str, con)
+                            rdr = cmd.ExecuteReader
+                            While rdr.Read
+                        %>
+                        <li><a href="#" title="<%=rdr("menudesc")%>" rel="<%=rdr("menudesc").tostring().replace(" ","_")%>">
+                            <span>
+                                <%=rdr("menudesc") %></span></a></li>
+                        <%
+                        End While
+                        rdr.Close()
+                        %>
+                    </ul>
+                </div>
+            </td>
+
+        
+        </tr>
+        <tr>
+            <td colspan="4" align="center">
+                <%
+                    Dim con1 As SqlConnection = New SqlConnection(ConfigurationManager.ConnectionStrings("LocalDb").ConnectionString)
+                    Dim cmd1 As SqlCommand
+                    Dim rdr1 As SqlDataReader
+                    Dim con2 As SqlConnection = New SqlConnection(ConfigurationManager.ConnectionStrings("LocalDb").ConnectionString)
+                    Dim cmd2 As SqlCommand
+                    Dim rdr2 As SqlDataReader
+                    Dim Str1 As String = ""
+                    If con1.State = ConnectionState.Open Then
+                        con.Close()
+                    End If
+                    con1.Open()
+                    If con2.State = ConnectionState.Open Then
+                        con.Close()
+                    End If
+                    con2.Open()
+                    Str1 = "select mi.id,mg.groupid,mg.rights,mi.mainmenuid,mi.submenuid,mi.menudesc,mi.pagename,mi.mtag"
+                    Str1 = Str1 & " from tbl_asset_menugroup mg,tbl_asset_users usr,tbl_asset_menuitems mi where mg.menuid = mi.id and mi.submenuid = 0 and rights in(1,2) and mtag = 0"
+                    Str1 = Str1 & " and mg.groupid = usr.usergroup and usr.userid = '" & Session("EmpNo") & "' order by mi.mainmenuid asc"
+                    cmd = New SqlCommand(Str, con)
+                    rdr1 = cmd.ExecuteReader
+                    While rdr1.Read%>
+                <div id="<%=rdr1("menudesc").tostring().replace(" ","_")%>" class="dropmenudiv_c">
+                    <%
+                        Str = ""
+                        Str = "select mi.id,mg.groupid,mg.rights,mi.mainmenuid,mi.submenuid,mi.menudesc,mi.pagename,mi.mtag"
+                        Str = Str & " from tbl_asset_menugroup mg,tbl_asset_users usr,tbl_asset_menuitems mi where mg.menuid = mi.id and mi.submenuid <> 0 and rights in(1,2) and mtag = 0"
+                        Str = Str & " and mg.groupid = usr.usergroup and usr.userid = '" & Session("EmpNo") & "' and mi.mainmenuid =" & rdr1("mainmenuid") & " order by mi.id asc"
+                        cmd2 = New SqlCommand(Str, con2)
+                        rdr2 = cmd2.ExecuteReader
+                        While rdr2.Read%>
+                    <a href="<%=rdr2("pagename")%>">
+                        <%=rdr2("menudesc")%></a>
+                    <%  End While
+                        rdr2.Close()
+                    %>
+                </div>
+                <%
+                End While
+                rdr1.Close()
+                con1.Close()
+                con2.Close()
+                %>
+                <script type="text/javascript">
+                    tabdropdown.init("slidemenu")
+                </script>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                &nbsp
+            </td>
+
+        </tr>
+        <tr>
+            <td style="width: 100%; padding-right: 1px; padding-top: 5px;" colspan="4" valign="top">
+                <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+                </asp:ContentPlaceHolder>
+            </td>
+        </tr>
+    </table>
+
+
+
+    </form>
+</body>
+</html>

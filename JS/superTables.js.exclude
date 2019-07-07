@@ -1,0 +1,433 @@
+///////////////////////////////////////////////////////////////////////////////////////// 
+// SUPER TABLES - VERSION 0.21
+// SCRIPT BY MATT MURPHY --- visit www.matts411.com
+///////////////////////////////////////////////////////////////////////////////////////// 
+// NOTES: 
+//  function call: setupSuperTable() arguments:
+//      A - table id
+//		B - css skin
+//      C - fix first column - t/f
+//      D - columns resizable - t/f
+///////////////////////////////////////////////////////////////////////////////////////// 
+// KNOWN ISSUES / BUGS:
+// 1. Speed optimization needed
+// 2. Safari slow on column resize and scrolling with multiple sTables rendered
+// 3. Opera - same as above but to a lesser degree
+// 4. Overall code optimization needed
+///////////////////////////////////////////////////////////////////////////////////////// 
+
+var sT = new Array();
+superTable.instances = [];
+
+function setupSuperTable(A, B, C, D) {
+	if(!A) return;
+    document.getElementById(A).className = 'sTempTable';
+	
+	var i = sT.length;
+	sT[i] = new superTable(A, B, C, D);
+	sT[i].initiateDomEvents(i);
+}
+
+//  INITIALIZE
+/////////////////////////////////////////////////////////////////////////////////////////
+function superTable(A, B, C, D) {
+	var table = document.getElementById(A); 
+	if(B == "") { 
+		this.skin = '_Default'; 
+	} else { 
+		this.skin = '_' + B; 
+	}
+    this.fixedCol = C;
+    this.resizable = D;
+    this.index = superTable.instances.length;
+    superTable.instances[this.index] = this;
+
+    /////////////// GET THE COLUMN WIDTHS FIRST
+    this.columnWidths = new Array();
+  	for(i=0; i<table.tBodies[0].rows[0].cells.length; i++) {
+    	this.columnWidths[i] = table.tBodies[0].rows[0].cells[i].offsetWidth;
+		if(navigator.userAgent.toLowerCase().indexOf("safari") != -1) {
+			this.columnWidths[i] += 10; // safari's text is wider/bolder
+		}
+    }
+    
+    /////////////// COPY THE TABLE DATA
+    this.headerNodes = new Array();
+    if(table.tHead) {
+        for(i=0; i<table.tHead.rows[0].cells.length; i++) {
+            this.headerNodes[i] = table.tHead.rows[0].cells[i].childNodes;
+        }
+        table.removeChild(table.tHead);
+    } else {
+        for(i=0; i<table.tBodies[0].rows[0].cells.length; i++) {
+            this.headerNodes[i] = table.tBodies[0].rows[0].cells[i].childNodes;
+        }
+        table.tBodies[0].removeChild(table.tBodies[0].rows[0]);
+    }
+
+    this.dataNodes = new Array();
+    for(i=0; i<table.tBodies[0].rows.length; i++) {
+        this.dataNodes[i] = new Array();
+        for(j=0; j<table.tBodies[0].rows[i].cells.length; j++) {
+            this.dataNodes[i][j] = table.tBodies[0].rows[i].cells[j].childNodes;
+        }
+    }
+    
+    /////////////// REMOVE THE OLD TABLE AND CREATE THE SUPER TABLE DOM
+    var sParent = table.parentNode;
+    sParent.removeChild(table);
+    
+    this.sContainer = document.createElement('DIV');
+    this.sHeaderContainer = document.createElement('DIV');
+    this.sHeaderTable = document.createElement('TABLE');
+    this.sDataContainer = document.createElement('DIV');
+    this.sDataTable = document.createElement('TABLE');
+    
+    superTable.instances[this.index].setupTableDOM('headerTable');
+    superTable.instances[this.index].setupTableDOM('dataTable');
+    
+    this.sHeaderContainer.appendChild(this.sHeaderTable);
+    this.sContainer.appendChild(this.sHeaderContainer);
+    this.sDataContainer.appendChild(this.sDataTable);
+    this.sContainer.appendChild(this.sDataContainer);
+    sParent.appendChild(this.sContainer);
+    
+    /////////////// SETUP THE FIXED COLUMN IF DESIRED
+    if(this.fixedCol) {
+        superTable.instances[this.index].setupFixedColumn();
+    }
+
+    /////////////// STYLE THE TABLES AND ALIGN THE COLUMNS
+    this.sContainer.className = 'sContainer' + this.skin;
+    this.sHeaderTable.className = 'sTableHeader' + this.skin;
+    this.sDataTable.className = 'sTableData' + this.skin;
+    
+	if(this.fixedCol) {
+	    for(i=0; i<(this.columnWidths.length-1); i++) {
+	        this.sHeaderTable.tBodies[0].rows[0].cells[i].style.width = this.columnWidths[i+1] + 'px';
+	        this.sDataTable.tBodies[0].rows[0].cells[i].style.width = this.columnWidths[i+1] + 'px';
+	    }
+	} else {
+	    for(i=0; i<this.columnWidths.length; i++) {
+	        this.sHeaderTable.tBodies[0].rows[0].cells[i].style.width = this.columnWidths[i] + 'px';
+	        this.sDataTable.tBodies[0].rows[0].cells[i].style.width = this.columnWidths[i] + 'px';
+	    }
+	}
+	this.sHeaderTable.style.tableLayout = 'fixed';
+    this.sDataTable.style.tableLayout = 'fixed';
+	
+    if(this.fixedCol) {
+        this.sHeaderTable.style.right = (this.sFixedHeaderTable.offsetWidth*-1) + 'px';
+        this.sDataContainer.style.marginLeft = this.sFixedDataTable.offsetWidth + 'px';
+        this.sDataContainer.style.width = (this.sContainer.clientWidth - this.sFixedHeaderTable.offsetWidth) + 'px';
+    } else {
+        this.sDataContainer.style.width = '100%';
+    }
+    this.sDataContainer.style.height = (this.sContainer.clientHeight - this.sHeaderTable.offsetHeight) + 'px';
+    this.sDataContainer.style.overflow = 'auto';
+    superTable.instances[this.index].drawOverflowBorders();
+	
+    if(this.resizable) {
+        superTable.instances[this.index].setupResizableBehavior();
+    }
+}
+
+
+//  SETUP TABLE DOM [ str tableType ]
+/////////////////////////////////////////////////////////////////////////////////////////
+superTable.prototype.setupTableDOM = function(tableType) {
+    switch(tableType) {
+        case 'headerTable':
+            var sTbody = document.createElement('TBODY');
+            var sRow = document.createElement('TR');
+            for(i=0; i<this.headerNodes.length; i++) {
+                var sTh = document.createElement('TH');
+                var sDiv = document.createElement('DIV');
+                for(j=0; j<this.headerNodes[i].length; j++) {
+                    sDiv.appendChild(this.headerNodes[i][j].cloneNode(true));
+                }
+                sTh.appendChild(sDiv);
+                sRow.appendChild(sTh);
+            }
+            sTbody.appendChild(sRow);
+            this.sHeaderTable.appendChild(sTbody);
+            break;
+        case 'dataTable':
+            var sTbody = document.createElement('TBODY');
+            for(i=0; i<this.dataNodes.length; i++) {
+                var sRow = document.createElement('TR');
+                if(i % 2 == 1) { 
+                    sRow.className = 'b' + this.skin;
+                }
+                for(j=0; j<this.dataNodes[i].length; j++) {
+                    var sTd = document.createElement('TD');
+                    var sDiv = document.createElement('DIV');
+                    for(k=0; k<this.dataNodes[i][j].length; k++) {
+                        sDiv.appendChild(this.dataNodes[i][j][k].cloneNode(true));
+                    }
+                    sTd.appendChild(sDiv);
+                    sRow.appendChild(sTd);
+                }
+                sTbody.appendChild(sRow);
+            }
+            this.sDataTable.appendChild(sTbody);
+            break;
+        case 'fixedTables':
+            var sTbody = document.createElement('TBODY');
+            this.sFixedHeaderTable.appendChild(sTbody);
+            sTbody.appendChild(document.createElement('TR'));
+            var thCell = this.sHeaderTable.tBodies[0].rows[0].cells[0].cloneNode(true);
+            this.sHeaderTable.tBodies[0].rows[0].removeChild(this.sHeaderTable.tBodies[0].rows[0].cells[0]);
+            sTbody.rows[0].appendChild(thCell);
+            
+            sTbodyB = document.createElement('TBODY');
+            this.sFixedDataTable.appendChild(sTbodyB);
+            for(i=0; i<this.sDataTable.tBodies[0].rows.length; i++) {
+                sTbodyB.appendChild(document.createElement('TR'));
+                sTbodyB.rows[i].appendChild(this.sDataTable.tBodies[0].rows[i].cells[0].cloneNode(true));
+                this.sDataTable.tBodies[0].rows[i].removeChild(this.sDataTable.tBodies[0].rows[i].cells[0]);
+            }
+            break;
+    }
+}
+ 
+
+//  SETUP FIXED COLUMN
+/////////////////////////////////////////////////////////////////////////////////////////
+superTable.prototype.setupFixedColumn = function() {
+        this.sFixedHeaderContainer = document.createElement('DIV');
+        this.sFixedHeaderTable = document.createElement('TABLE');
+        this.sFixedDataContainer = document.createElement('DIV');
+        this.sFixedDataTable = document.createElement('TABLE');
+        
+        superTable.instances[this.index].setupTableDOM('fixedTables');
+        
+        this.sFixedHeaderContainer.appendChild(this.sFixedHeaderTable);
+        this.sFixedDataContainer.appendChild(this.sFixedDataTable);
+        this.sContainer.insertBefore(this.sFixedHeaderContainer, this.sHeaderContainer);
+        this.sContainer.insertBefore(this.sFixedDataContainer, this.sDataContainer);
+        
+        this.sFixedHeaderTable.className = 'sTableFixedHeader' + this.skin;
+        this.sFixedDataTable.className = 'sTableFixedData' + this.skin;
+        
+        this.sFixedHeaderTable.tBodies[0].rows[0].cells[0].style.width = this.columnWidths[0] + 'px';
+        this.sFixedDataTable.tBodies[0].rows[0].cells[0].style.width = this.columnWidths[0] + 'px';
+        this.sFixedDataTable.style.top = this.sFixedHeaderTable.offsetHeight + 'px';
+		
+		this.sFixedHeaderTable.style.tableLayout = 'fixed';
+	    this.sFixedDataTable.style.tableLayout = 'fixed';
+}
+ 
+
+//  SETUP RESIZABLE BEHAVIOR
+/////////////////////////////////////////////////////////////////////////////////////////
+superTable.prototype.setupResizableBehavior = function() {
+	this.minColumnWidthAllowed = 10; // in pixels
+	this.maxColumnWidthAllowed = parseInt(this.sContainer.offsetWidth*0.5); // in pixels -- applies to the fixed column only
+    this.sHeaderTable.className = 'sTableHeader' + this.skin + ' sTableResize' + this.skin;
+    this.sDataTable.className = 'sTableData' + this.skin + ' sTableResize' + this.skin;
+    if(this.fixedCol) {
+        this.sFixedHeaderTable.className = 'sTableFixedHeader' + this.skin + ' sTableResize' + this.skin;
+        this.sFixedDataTable.className = 'sTableFixedData' + this.skin + ' sTableResize' + this.skin;
+    }
+    
+    this.sColMoversContainer = document.createElement('DIV');
+    this.sColMoversContainer.className = 'sResizeContainer' + this.skin;
+    this.sContainer.appendChild(this.sColMoversContainer);
+    
+    var leftTrax = 0;
+    var sThs = this.sContainer.getElementsByTagName('TH');
+	this.sColMovers = new Array();
+    for(i=0; i<sThs.length; i++) {
+        this.sColMovers[i] = document.createElement('A');
+        this.sColMovers[i].innerHTML = '&nbsp';
+		this.sColMovers[i].setAttribute('colIndex', i);
+        this.sColMovers[i].style.left = ((sThs[i].clientWidth-2) + leftTrax) + 'px';
+        this.sColMovers[i].style.height = this.sHeaderTable.offsetHeight + 'px';
+        leftTrax += sThs[i].offsetWidth;
+        if(this.fixedCol && i == 0) {
+            this.sColMovers[i].className = 'sResizeAFixed' + this.skin;
+            this.sContainer.appendChild(this.sColMovers[i]);
+        } else {
+            this.sColMovers[i].className = 'sResizeA' + this.skin;
+            this.sColMoversContainer.appendChild(this.sColMovers[i]);
+        }
+    }
+	
+	this.sColSlider = document.createElement('SPAN');
+	this.sColSlider.className = 'sColSlider' + this.skin;
+	if(this.sDataTable.offsetHeight > (this.sContainer.clientHeight - this.sHeaderTable.offsetHeight)) {
+        this.sColMoversContainer.style.height = (this.sContainer.clientHeight - 16) + 'px';
+		this.sColSlider.style.height = (this.sContainer.clientHeight - 16) + 'px';
+	} else {
+        this.sColMoversContainer.style.height = this.sContainer.clientHeight + 'px';
+		this.sColSlider.style.height = this.sContainer.clientHeight + 'px';
+	}
+	this.sContainer.appendChild(this.sColSlider);
+}
+
+
+//  DRAW OVERFLOW BORDERS
+/////////////////////////////////////////////////////////////////////////////////////////
+superTable.prototype.drawOverflowBorders = function() {
+	if(this.fixedCol) {
+		if(this.sDataContainer.clientWidth < this.sDataTable.clientWidth) {
+			if(document.getElementById('sHorizontalOverflowDiv' + this.index)) {
+				this.sOverflowHDiv.style.width = (this.sFixedDataTable.offsetWidth-1) + 'px';
+			} else {
+				this.sOverflowHDiv = document.createElement('DIV');
+				this.sOverflowHDiv.id = 'sHorizontalOverflowDiv' + this.index;
+				this.sOverflowHDiv.className = 'sHorizontalOverflowDiv' + this.skin;
+				this.sOverflowHDiv.style.top = (this.sContainer.clientHeight - 16) + 'px';
+				this.sOverflowHDiv.style.width = (this.sFixedDataTable.offsetWidth-1) + 'px';
+				this.sContainer.appendChild(this.sOverflowHDiv);
+			}
+		} else if(document.getElementById('sHorizontalOverflowDiv' + this.index)) {
+			this.sContainer.removeChild(this.sOverflowHDiv);
+		}
+	}
+	if(this.sDataContainer.clientHeight < this.sDataTable.clientHeight) {
+		this.sOverflowVDiv = document.createElement('DIV');
+		this.sOverflowVDiv.id = 'sVerticalOverflowDiv' + this.index;
+		this.sOverflowVDiv.className = 'sVerticalOverflowDiv' + this.skin;
+		this.sOverflowVDiv.style.left = (this.sContainer.clientWidth - 16) + 'px';
+		this.sOverflowVDiv.style.height = (this.sHeaderTable.offsetHeight-1) + 'px';
+		this.sContainer.appendChild(this.sOverflowVDiv);
+	} else if(document.getElementById('sVerticalOverflowDiv' + this.index)) {
+		this.sContainer.removeChild(this.sOverflowVDiv);
+    }
+}
+
+
+//  INITIATE DOM EVENTS
+/////////////////////////////////////////////////////////////////////////////////////////
+superTable.prototype.initiateDomEvents = function(x) {
+    if(this.fixedCol) {
+       	this.sDataContainer.onscroll = function() {
+       		sT[x].sHeaderTable.style.right = (sT[x].sDataContainer.scrollLeft - sT[x].sFixedHeaderTable.offsetWidth) + 'px';
+           	sT[x].sFixedDataTable.style.top = ((sT[x].sDataContainer.scrollTop*-1) + sT[x].sFixedHeaderTable.offsetHeight) + 'px';
+       	}
+    } else {
+    	this.sDataContainer.onscroll = function() {
+    		sT[x].sHeaderTable.style.right = sT[x].sDataContainer.scrollLeft + 'px';
+    	}
+    }
+	
+	if(this.resizable) {
+		if(window.addEventListener) {
+			this.sDataContainer.addEventListener('scroll', function() { sT[x].sColMoversContainer.style.left = (sT[x].sDataContainer.scrollLeft*-1) + 'px'; }, false);
+		} else {
+			this.sDataContainer.attachEvent('onscroll', function() { sT[x].sColMoversContainer.style.left = (sT[x].sDataContainer.scrollLeft*-1) + 'px'; });
+		}
+		
+	    for(i=0; i<this.sColMovers.length; i++) {
+			this.sColMovers[i].onmousedown = function(e) {
+				sT[x].startColumnResize(x, e);
+			}
+	    }
+	}
+}
+
+
+//  START COLUMN RESIZE
+/////////////////////////////////////////////////////////////////////////////////////////
+superTable.prototype.startColumnResize = function(x, e) {
+	if (window.event) { e = window.event; resizer = e.srcElement; e.cancelBubble = true; } else { resizer = e.target; e.stopPropagation(); }
+	
+	this.currentResizeCol = parseInt(resizer.getAttribute('colIndex'));
+	if(this.fixedCol) {
+		if(this.currentResizeCol == 0) {
+			this.sBaseWidth = e.clientX - this.sFixedHeaderTable.tBodies[0].rows[0].cells[0].offsetWidth;
+			this.sSlideBackWidth = this.sFixedHeaderTable.tBodies[0].rows[0].cells[0].offsetWidth;
+            this.sColSlider.style.left = resizer.style.left;
+		} else {
+			this.sBaseWidth = e.clientX - this.sHeaderTable.tBodies[0].rows[0].cells[this.currentResizeCol-1].offsetWidth;
+			this.sSlideBackWidth = this.sHeaderTable.tBodies[0].rows[0].cells[this.currentResizeCol-1].offsetWidth;
+            this.sColSlider.style.left = (parseInt(resizer.style.left) - this.sDataContainer.scrollLeft) + 'px';
+		}
+	} else {
+		this.sBaseWidth = e.clientX - this.sHeaderTable.tBodies[0].rows[0].cells[this.currentResizeCol].offsetWidth;
+		this.sSlideBackWidth = this.sHeaderTable.tBodies[0].rows[0].cells[this.currentResizeCol].offsetWidth;
+        this.sColSlider.style.left = (parseInt(resizer.style.left) - this.sDataContainer.scrollLeft) + 'px';
+	}
+    this.sColSlider.style.display = 'block';
+	if(window.getSelection) { window.getSelection().removeAllRanges(); } else { document.selection.empty(); }
+	
+	this.resizeColumnRefFunction = function(e) { sT[x].resizeColumn(e); }; // set as an object variable so it can be referenced later for removal
+	this.endColumnResizeRefFunction = function(e) { sT[x].endColumnResize(x, e); };
+	if(window.addEventListener) {
+		document.addEventListener('mousemove', this.resizeColumnRefFunction, true);
+		document.addEventListener('mouseup', this.endColumnResizeRefFunction, true);
+	} else {
+		document.attachEvent('onmousemove', this.resizeColumnRefFunction);
+		document.attachEvent('onmouseup', this.endColumnResizeRefFunction);
+	}
+	return false;
+}
+
+
+//  RESIZE COLUMN
+/////////////////////////////////////////////////////////////////////////////////////////
+superTable.prototype.resizeColumn = function(e) {
+	if (window.event) { e = window.event; e.cancelBubble = true; } else { e.stopPropagation(); }
+
+	if(window.getSelection) { window.getSelection().removeAllRanges(); } else { document.selection.empty(); }
+	var calcWidth = e.clientX - this.sBaseWidth;
+	if(calcWidth < this.minColumnWidthAllowed) {
+		this.sColSlider.style.marginLeft = (this.minColumnWidthAllowed - this.sSlideBackWidth) + 'px';
+		this.columnWidths[this.currentResizeCol] = this.minColumnWidthAllowed;
+	} else if(calcWidth > this.maxColumnWidthAllowed) {
+		this.sColSlider.style.marginLeft = (this.maxColumnWidthAllowed - this.sSlideBackWidth) + 'px';
+		this.columnWidths[this.currentResizeCol] = this.maxColumnWidthAllowed;
+	} else {
+		this.sColSlider.style.marginLeft = (calcWidth - this.sSlideBackWidth) + 'px';
+		this.columnWidths[this.currentResizeCol] = calcWidth;
+	}
+	
+	return false;
+}
+
+
+//  END COLUMN RESIZE
+/////////////////////////////////////////////////////////////////////////////////////////
+superTable.prototype.endColumnResize = function(x, e) {
+	if (window.event) { e = window.event; e.cancelBubble = true; } else { e.stopPropagation(); }
+	
+	if(this.fixedCol) {
+		if(this.currentResizeCol == 0) {
+			this.sFixedHeaderTable.tBodies[0].rows[0].cells[0].style.width = this.columnWidths[0] + 'px';
+        	this.sFixedDataTable.tBodies[0].rows[0].cells[0].style.width = this.columnWidths[0] + 'px';
+        	this.sDataContainer.style.marginLeft = this.sFixedDataTable.offsetWidth + 'px';
+        	this.sDataContainer.style.width = (this.sContainer.clientWidth - this.sFixedHeaderTable.offsetWidth) + 'px';
+		} else {
+			this.sHeaderTable.tBodies[0].rows[0].cells[this.currentResizeCol-1].style.width = this.columnWidths[this.currentResizeCol] + 'px';
+			this.sDataTable.tBodies[0].rows[0].cells[this.currentResizeCol-1].style.width = this.columnWidths[this.currentResizeCol] + 'px';
+		}
+        this.sHeaderTable.style.right = ((this.sFixedHeaderTable.offsetWidth*-1) + this.sDataContainer.scrollLeft) + 'px';
+	} else {
+		this.sHeaderTable.tBodies[0].rows[0].cells[this.currentResizeCol].style.width = this.columnWidths[this.currentResizeCol] + 'px';
+		this.sDataTable.tBodies[0].rows[0].cells[this.currentResizeCol].style.width = this.columnWidths[this.currentResizeCol] + 'px';
+        this.sHeaderTable.style.right = this.sDataContainer.scrollLeft + 'px';
+	}
+    this.sColMoversContainer.style.left = (this.sDataContainer.scrollLeft*-1) + 'px';
+	sT[x].drawOverflowBorders();
+	if(window.getSelection) { window.getSelection().removeAllRanges(); } else { document.selection.empty(); }
+	this.sColSlider.style.left = '0px';
+	this.sColSlider.style.marginLeft = '0px';
+	this.sColSlider.style.display = 'none';
+    var leftTrax = 0;
+    var sThs = this.sContainer.getElementsByTagName('TH');
+    for(i=0; i<sThs.length; i++) {
+        this.sColMovers[i].style.left = ((sThs[i].clientWidth-2) + leftTrax) + 'px';
+        leftTrax += sThs[i].offsetWidth;
+    }
+	if(window.addEventListener) {
+		document.removeEventListener('mousemove', this.resizeColumnRefFunction, true);
+		document.removeEventListener('mouseup', this.endColumnResizeRefFunction, true);
+	} else {
+		document.detachEvent('onmousemove', this.resizeColumnRefFunction);
+		document.detachEvent('onmouseup', this.endColumnResizeRefFunction);
+	}
+	return false;
+}
+
